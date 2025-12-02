@@ -1,15 +1,21 @@
-Smoothie Bliss - Demo Site (production-ready starter)
+# Smoothie Bliss Website
 
-Files:
-- index.html       -> Main site with full menu, filter/search/sort, and sections
-- styles.css       -> Polished responsive stylesheet
-- script.js        -> Advanced filter, search, sort logic (client-side)
-- images/          -> SVG placeholders for logo and 20 smoothies
+A fun, responsive demo site for a smoothie shop. Browse 20+ smoothies, filter by category, search by name, sort alphabetically, and add to cart!
 
-How to use:
-1. Unzip the archive and open index.html in a modern browser.
-2. The filter buttons support multi-select (click "All" to reset).
-3. Use the search box to filter by name.
-4. Use the sort dropdown to order items alphabetically.
+## Features
+- Category filters (Fruity, Green, etc.)
+- Real-time search
+- Shopping cart with quantity controls
+- Mobile-friendly design
 
-If you want PNG/JPG images instead of SVG placeholders, provide image files and replace images/*.svg.
+## Quick Start
+1. Clone the repo: `git clone https://github.com/Pranitha1331/smoothie_bliss_website.git`
+2. Open `index.html` in your browser.
+
+## Live Demo
+[View here](https://your-live-url.com)
+
+## Customization
+Swap SVGs in `/images/` with your JPGs. Update prices in `index.html`.
+
+Built with ❤️ by Pranitha1331
