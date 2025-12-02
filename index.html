@@ -1,142 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smoothie Bliss</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smoothie Bliss - Fresh & Delicious Smoothies</title>
+  <style>
+    /* === GENERAL STYLES === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #fff1eb, #ffeef8);
+      color: #333;
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+    /* Header */
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 25px 0; background: white; border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px;
+    }
+    .logo { display: flex; align-items: center; gap: 15px; }
+    .logo img { height: 70px; border-radius: 50%; }
+    .logo h1 { font-size: 2.2em; color: #ff6b6b; }
+    nav ul { display: flex; gap: 35px; list-style: none; }
+    nav a {
+      text-decoration: none; color: #555; font-weight: 600; font-size: 1.1em;
+      padding: 10px 15px; border-radius: 25px; transition: 0.3s;
+    }
+    nav a:hover { background: #ffeef8; color: #ff6b6b; }
+
+    h2 {
+      text-align: center; font-size: 2.8em; color: #ff6b6b;
+      margin: 60px 0 30px; text-shadow: 2px 2px 10px rgba(255,107,107,0.2);
+    }
+
+    /* === MENU CONTROLS === */
+    .controls {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      background: white; padding: 25px; border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08); margin: 30px 0;
+      gap: 20px;
+    }
+    .filter-menu {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 12px 24px; border: 2px solid #ff6b6b; background: white;
+      color: #ff6b6b; border-radius: 50px; cursor: pointer;
+      font-weight: bold; transition: all 0.3s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: #ff6b6b; color: white; transform: scale(1.05);
+    }
+    #searchInput {
+      padding: 14px 20px; border: 2px solid #ff6b6b; border-radius: 50px;
+      font-size: 16px; width: 300px; outline: none;
+    }
+
+    /* === SMOOTHIE GRID === */
+    .smoothie-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 30px;
+      padding: 30px 0;
+    }
+    .smoothie-item {
+      background: white; border-radius: 24px; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      transition: all 0.4s ease; text-align: center;
+    }
+    .smoothie-item:hover {
+      transform: translateY(-15px); box-shadow: 0 20px 40px rgba(255,107,107,0.2);
+    }
+    .smoothie-item img {
+      width: 100%; height: 230px; object-fit: cover;
+    }
+    .smoothie-item h3 {
+      margin: 18px 0 10px; font-size: 1.5em; color: #333;
+    }
+    .smoothie-item .desc {
+      padding: 0 20px; color: #777; font-size: 14px; margin-bottom: 15px;
+    }
+    .meta {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 20px 20px;
+    }
+    .price {
+      font-size: 24px; font-weight: bold; color: #ff6b6b;
+    }
+    .badge {
+      background: #51cf66; color: white; padding: 8px 16px;
+      border-radius: 30px; font-size: 13px; font-weight: bold;
+    }
+    .add-btn {
+      background: #ff6b6b; color: white; border: none;
+      padding: 14px 28px; border-radius: 50px; cursor: pointer;
+      font-weight: bold; font-size: 16px; transition: 0.3s;
+    }
+    .add-btn:hover {
+      background: #ff5252; transform: scale(1.08);
+    }
+
+    /* === CART BUTTON === */
+    #cartBtn {
+      position: fixed; top: 20px; right: 20px; z-index: 1000;
+      background: #ff6b6b; color: white; border: none;
+      padding: 18px 32px; border-radius: 50px; font-size: 20px;
+      font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+      transition: 0.3s;
+    }
+    #cartBtn:hover { transform: scale(1.1); }
+    .count {
+      background: white; color: #ff6b6b; width: 34px; height: 34px;
+      border-radius: 50%; display: inline-block; margin-left: 12px;
+      font-weight: bold; line-height: 34px; font-size: 16px;
+    }
+
+    /* === CART SIDEBAR === */
+    .cart-sidebar {
+      position: fixed; top: 0; right: -450px; width: 450px; height: 100%;
+      background: white; box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+      transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 999; padding: 30px; overflow-y: auto;
+    }
+    .cart-sidebar.open { right: 0; }
+    .cart-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 20px; border-bottom: 3px solid #eee;
+    }
+    .close-cart {
+      background: none; border: none; font-size: 40px; cursor: pointer; color: #aaa;
+    }
+    .cart-item {
+      display: flex; align-items: center; padding: 20px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .cart-item img {
+      width: 90px; height: 90px; object-fit: cover; border-radius: 16px; margin-right: 20px;
+    }
+    .cart-item-name { font-weight: bold; font-size: 18px; }
+    .cart-item-price { color: #ff6b6b; font-weight: bold; }
+    .quantity-controls {
+      display: flex; align-items: center; gap: 15px; margin-top: 10px;
+    }
+    .quantity-btn {
+      width: 40px; height: 40px; border: 2px solid #ff6b6b;
+      background: white; color: #ff6b6b; border-radius: 50%;
+      cursor: pointer; font-size: 20px; font-weight: bold;
+    }
+    .cart-total {
+      font-size: 28px; font-weight: bold; text-align: right;
+      padding: 30px 0; color: #ff6b6b; border-top: 3px solid #eee;
+    }
+    .checkout-btn {
+      width: 100%; padding: 20px; background: #51cf66; color: white;
+      border: none; border-radius: 16px; font-size: 22px; font-weight: bold;
+      cursor: pointer; margin-top: 20px;
+    }
+    .empty-cart { text-align: center; color: #aaa; font-size: 20px; padding: 80px 20px; }
+
+    /* === OTHER SECTIONS === */
+    section { background: white; padding: 60px; border-radius: 24px; margin: 60px 0;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+    .delivery-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 50px;
+    }
+    .social-links {
+      display: flex; justify-content: center; gap: 50px; margin-top: 30px;
+    }
+    .social-links a {
+      font-size: 40px; color: #ff6b6b; text-decoration: none;
+    }
+    footer {
+      text-align: center; padding: 60px 20px; background: #111; color: #eee;
+      font-size: 16px; margin-top: 100px;
+    }
+  </style>
 </head>
 <body>
+
   <div class="container">
     <header>
       <div class="logo">
-        <img src="images/logo.png" alt="Smoothie Bliss Logo">
+        <img src="images/logo.png" alt="Smoothie Bliss Logo" />
         <h1>Smoothie Bliss</h1>
       </div>
       <nav>
         <ul>
           <li><a href="#menu">Menu</a></li>
-          <li><a href="#delivery">Delivery & Payment</a></li>
           <li><a href="#preferences">Preferences</a></li>
+          <li><a href="#delivery">Delivery & Payment</a></li>
           <li><a href="#support">Support</a></li>
-          <li><a href="#social">Social</a></li>
         </ul>
       </nav>
     </header>
 
+    <!-- Floating Cart Button -->
+    <button id="cartBtn">Cart <span class="count" id="cartCount">0</span></button>
+
     <main>
+
+      <!-- MENU WITH FILTER & SEARCH -->
       <section id="menu">
         <h2>Our Smoothies</h2>
-        <div class="smoothie-list">
 
-          <div class="smoothie-item">
-            <img src="images/s1.jpg" alt="Smoothie 1">
-            <h3>Smoothie 1</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+        <div class="controls">
+          <div class="filter-menu">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="fruity">Fruity</button>
+            <button class="filter-btn" data-filter="green">Green</button>
+            <button class="filter-btn" data-filter="protein">Protein</button>
+            <button class="filter-btn" data-filter="chocolate">Chocolate</button>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s2.jpg" alt="Smoothie 2">
-            <h3>Smoothie 2</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+          <input type="search" id="searchInput" placeholder="Search smoothies..." />
+        </div>
+
+        <div class="smoothie-list" id="smoothieList">
+
+          <!-- 20 SMOOTHIES -->
+          <div class="smoothie-item" data-category="fruity" data-title="Mango Paradise">
+            <img src="images/s1.jpg" alt="Mango Paradise" />
+            <h3>Mango Paradise</h3>
+            <p class="desc">Ripe mango, pineapple, and a splash of orange juice.</p>
+            <div class="meta"><span class="price">$7.99</span><span class="badge">fruity</span><button class="add-btn" data-name="Mango Paradise" data-price="7.99" data-img="images/s1.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s3.jpg" alt="Smoothie 3">
-            <h3>Smoothie 3</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="fruity" data-title="Berry Blast">
+            <img src="images/s2.jpg" alt="Berry Blast" />
+            <h3>Berry Blast</h3>
+            <p class="desc">Mixed berries, banana, and Greek yogurt.</p>
+            <div class="meta"><span class="price">$8.49</span><span class="badge">fruity</span><button class="add-btn" data-name="Berry Blast" data-price="8.49" data-img="images/s2.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s4.jpg" alt="Smoothie 4">
-            <h3>Smoothie 4</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="fruity" data-title="Tropical Sunrise">
+            <img src="images/s3.jpg" alt="Tropical Sunrise" />
+            <h3>Tropical Sunrise</h3>
+            <p class="desc">Papaya, passion fruit, coconut milk, and lime.</p>
+            <div class="meta"><span class="price">$8.99</span><span class="badge">fruity</span><button class="add-btn" data-name="Tropical Sunrise" data-price="8.99" data-img="images/s3.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s5.jpg" alt="Smoothie 5">
-            <h3>Smoothie 5</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="fruity" data-title="Peachy Keen">
+            <img src="images/s4.jpg" alt="Peachy Keen" />
+            <h3>Peachy Keen</h3>
+            <p class="desc">Fresh peaches, apricot, and a hint of vanilla.</p>
+            <div class="meta"><span class="price">$7.79</span><span class="badge">fruity</span><button class="add-btn" data-name="Peachy Keen" data-price="7.79" data-img="images/s4.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s6.jpg" alt="Smoothie 6">
-            <h3>Smoothie 6</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="fruity" data-title="Strawberry Fields">
+            <img src="images/s5.jpg" alt="Strawberry Fields" />
+            <h3>Strawberry Fields</h3>
+            <p class="desc">Sweet strawberries, banana, and almond milk.</p>
+            <div class="meta"><span class="price">$7.49</span><span class="badge">fruity</span><button class="add-btn" data-name="Strawberry Fields" data-price="7.49" data-img="images/s5.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s7.jpg" alt="Smoothie 7">
-            <h3>Smoothie 7</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="fruity" data-title="Citrus Zest">
+            <img src="images/s6.jpg" alt="Citrus Zest" />
+            <h3>Citrus Zest</h3>
+            <p class="desc">Orange, grapefruit, lemon, and a touch of honey.</p>
+            <div class="meta"><span class="price">$7.29</span><span class="badge">fruity</span><button class="add-btn" data-name="Citrus Zest" data-price="7.29" data-img="images/s6.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s8.jpg" alt="Smoothie 8">
-            <h3>Smoothie 8</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <!-- GREEN -->
+          <div class="smoothie-item" data-category="green" data-title="Green Detox">
+            <img src="images/s7.jpg" alt="Green Detox" />
+            <h3>Green Detox</h3>
+            <p class="desc">Spinach, kale, cucumber, green apple, and ginger.</p>
+            <div class="meta"><span class="price">$8.79</span><span class="badge">green</span><button class="add-btn" data-name="Green Detox" data-price="8.79" data-img="images/s7.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s9.jpg" alt="Smoothie 9">
-            <h3>Smoothie 9</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="green" data-title="Emerald Energy">
+            <img src="images/s8.jpg" alt="Emerald Energy" />
+            <h3>Emerald Energy</h3>
+            <p class="desc">Kale, kiwi, avocado, mint, and coconut water.</p>
+            <div class="meta"><span class="price">$9.29</span><span class="badge">green</span><button class="add-btn" data-name="Emerald Energy" data-price="9.29" data-img="images/s8.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s10.jpg" alt="Smoothie 10">
-            <h3>Smoothie 10</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="green" data-title="Super Green">
+            <img src="images/s9.jpg" alt="Super Green" />
+            <h3>Super Green</h3>
+            <p class="desc">Spinach, spirulina, banana, and almond milk.</p>
+            <div class="meta"><span class="price">$8.99</span><span class="badge">green</span><button class="add-btn" data-name="Super Green" data-price="8.99" data-img="images/s9.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s11.jpg" alt="Smoothie 11">
-            <h3>Smoothie 11</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="green" data-title="Pineapple Greens">
+            <img src="images/s10.jpg" alt="Pineapple Greens" />
+            <h3>Pineapple Greens</h3>
+            <p class="desc">Pineapple, spinach, celery, and lemon.</p>
+            <div class="meta"><span class="price">$8.49</span><span class="badge">green</span><button class="add-btn" data-name="Pineapple Greens" data-price="8.49" data-img="images/s10.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s12.jpg" alt="Smoothie 12">
-            <h3>Smoothie 12</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="green" data-title="Mint Refresh">
+            <img src="images/s11.jpg" alt="Mint Refresh" />
+            <h3>Mint Refresh</h3>
+            <p class="desc">Kale, fresh mint, cucumber, lime, and apple.</p>
+            <div class="meta"><span class="price">$8.29</span><span class="badge">green</span><button class="add-btn" data-name="Mint Refresh" data-price="8.29" data-img="images/s11.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s13.jpg" alt="Smoothie 13">
-            <h3>Smoothie 13</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <!-- PROTEIN -->
+          <div class="smoothie-item" data-category="protein" data-title="Peanut Power">
+            <img src="images/s12.jpg" alt="Peanut Power" />
+            <h3>Peanut Power</h3>
+            <p class="desc">Peanut butter, banana, oats, protein powder, and milk.</p>
+            <div class="meta"><span class="price">$9.99</span><span class="badge">protein</span><button class="add-btn" data-name="Peanut Power" data-price="9.99" data-img="images/s12.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s14.jpg" alt="Smoothie 14">
-            <h3>Smoothie 14</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="protein" data-title="Mocha Muscle">
+            <img src="images/s13.jpg" alt="Mocha Muscle" />
+            <h3>Mocha Muscle</h3>
+            <p class="desc">Cold brew coffee, chocolate protein, almond butter.</p>
+            <div class="meta"><span class="price">$10.49</span><span class="badge">protein</span><button class="add-btn" data-name="Mocha Muscle" data-price="10.49" data-img="images/s13.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s15.jpg" alt="Smoothie 15">
-            <h3>Smoothie 15</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="protein" data-title="Vanilla Beast">
+            <img src="images/s14.jpg" alt="Vanilla Beast" />
+            <h3>Vanilla Beast</h3>
+            <p class="desc">Vanilla protein, Greek yogurt, flaxseed, and honey.</p>
+            <div class="meta"><span class="price">$9.79</span><span class="badge">protein</span><button class="add-btn" data-name="Vanilla Beast" data-price="9.79" data-img="images/s14.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s16.jpg" alt="Smoothie 16">
-            <h3>Smoothie 16</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="protein" data-title="Berry Protein Punch">
+            <img src="images/s15.jpg" alt="Berry Protein Punch" />
+            <h3>Berry Protein Punch</h3>
+            <p class="desc">Mixed berries, whey protein, chia seeds, oat milk.</p>
+            <div class="meta"><span class="price">$10.29</span><span class="badge">protein</span><button class="add-btn" data-name="Berry Protein Punch" data-price="10.29" data-img="images/s15.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s17.jpg" alt="Smoothie 17">
-            <h3>Smoothie 17</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <!-- CHOCOLATE -->
+          <div class="smoothie-item" data-category="chocolate" data-title="Choco Hazelnut Dream">
+            <img src="images/s16.jpg" alt="Choco Hazelnut Dream" />
+            <h3>Choco Hazelnut Dream</h3>
+            <p class="desc">Hazelnut spread, cocoa, banana, and almond milk.</p>
+            <div class="meta"><span class="price">$9.49</span><span class="badge">chocolate</span><button class="add-btn" data-name="Choco Hazelnut Dream" data-price="9.49" data-img="images/s16.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s18.jpg" alt="Smoothie 18">
-            <h3>Smoothie 18</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="chocolate" data-title="Double Chocolate">
+            <img src="images/s17.jpg" alt="Double Chocolate" />
+            <h3>Double Chocolate</h3>
+            <p class="desc">Dark cocoa, chocolate protein, peanut butter.</p>
+            <div class="meta"><span class="price">$9.99</span><span class="badge">chocolate</span><button class="add-btn" data-name="Double Chocolate" data-price="9.99" data-img="images/s17.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s19.jpg" alt="Smoothie 19">
-            <h3>Smoothie 19</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="chocolate" data-title="Mint Chocolate Chip">
+            <img src="images/s18.jpg" alt="Mint Chocolate Chip" />
+            <h3>Mint Chocolate Chip</h3>
+            <p class="desc">Cacao, fresh mint, spinach, dark chocolate nibs.</p>
+            <div class="meta"><span class="price">$9.79</span><span class="badge">chocolate</span><button class="add-btn" data-name="Mint Chocolate Chip" data-price="9.79" data-img="images/s18.jpg">Add</button></div>
           </div>
-          <div class="smoothie-item">
-            <img src="images/s20.jpg" alt="Smoothie 20">
-            <h3>Smoothie 20</h3>
-            <p>Delicious and refreshing blend of fruits, perfect for any occasion.</p>
+
+          <div class="smoothie-item" data-category="chocolate" data-title="Brownie Batter">
+            <img src="images/s19.jpg" alt="Brownie Batter" />
+            <h3>Brownie Batter</h3>
+            <p class="desc">Cacao, avocado, dates, and a pinch of sea salt.</p>
+            <div class="meta"><span class="price">$10.29</span><span class="badge">chocolate</span><button class="add-btn" data-name="Brownie Batter" data-price="10.29" data-img="images/s19.jpg">Add</button></div>
           </div>
+
+          <div class="smoothie-item" data-category="chocolate" data-title="Chocolate Covered Cherry">
+            <img src="images/s20.jpg" alt="Chocolate Covered Cherry" />
+            <h3>Chocolate Covered Cherry</h3>
+            <p class="desc">Tart cherries, cacao, almond butter, oat milk.</p>
+            <div class="meta"><span class="price">$10.79</span><span class="badge">chocolate</span><button class="add-btn" data-name="Chocolate Covered Cherry" data-price="10.79" data-img="images/s20.jpg">Add</button></div>
+          </div>
+
         </div>
       </section>
 
+      <!-- OTHER SECTIONS -->
       <section id="preferences">
         <h2>Your Preferences</h2>
-        <p>Choose your base: dairy milk, almond milk, coconut milk, soy milk, oat milk, or water.</p>
-        <p>Add-ons: protein powder, chia seeds, flaxseed, spinach, kale, peanut butter.</p>
-        <p>Sugar level options: no sugar, light sugar, regular, or extra sweet.</p>
+        <p><strong>Choose your base:</strong> dairy milk, almond milk, coconut milk, soy milk, oat milk, or water.</p>
+        <p><strong>Add-ons:</strong> protein powder, chia seeds, flaxseed, spinach, kale, peanut butter.</p>
+        <p><strong>Sugar level options:</strong> no sugar, light sugar, regular, or extra sweet.</p>
       </section>
 
       <section id="delivery">
@@ -145,9 +380,9 @@
           <div>
             <h3>Delivery</h3>
             <ul>
-              <li>Local delivery within 5 miles: free over $25, $5 under.</li>
+              <li>Local delivery within 5 miles: <strong>free over $25</strong>, $5 under.</li>
               <li>Next-day delivery for orders placed before 4pm.</li>
-              <li>Pickup available at our store: 123 Smoothie Ave.</li>
+              <li>Pickup available at our store: <strong>123 Smoothie Ave.</strong></li>
             </ul>
           </div>
           <div>
@@ -166,27 +401,135 @@
         <h2>Customer Support</h2>
         <p>If you have any questions or need help, we are here for you:</p>
         <ul>
-          <li>Phone: (123) 456-7890</li>
-          <li>Email: support@smoothiebliss.com</li>
+          <li>Phone: <strong>(123) 456-7890</strong></li>
+          <li>Email: <a href="mailto:support@smoothiebliss.com">support@smoothiebliss.com</a></li>
           <li>Live chat on our website (available 9am–6pm)</li>
         </ul>
       </section>
 
       <section id="social">
         <h2>Follow Us</h2>
-        <ul class="social-links">
-          <li><a href="#">Facebook</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">Twitter</a></li>
-          <li><a href="#">TikTok</a></li>
-        </ul>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook">Facebook</a>
+          <a href="#" aria-label="Instagram">Instagram</a>
+          <a href="#" aria-label="Twitter">Twitter</a>
+          <a href="#" aria-label="TikTok">TikTok</a>
+        </div>
       </section>
+
     </main>
 
     <footer>
-      <p>&copy; 2025 Smoothie Bliss | All Rights Reserved</p>
+      <p>© baby 2025 Smoothie Bliss | All Rights Reserved</p>
       <p>123 Smoothie Ave, Your City, State ZIP</p>
     </footer>
   </div>
+
+  <!-- CART SIDEBAR -->
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button class="close-cart" id="closeCart">×</button>
+    </div>
+    <div id="cartItems"><p class="empty-cart">Your cart is empty</p></div>
+    <div class="cart-total">Total: <span id="cartTotal">$0.00</span></div>
+    <button class="checkout-btn">Proceed to Checkout</button>
+  </div>
+
+  <script>
+    // Cart System
+    const cart = [];
+    const cartBtn = document.getElementById('cartBtn');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const closeCart = document.getElementById('closeCart');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    const cartCountEl = document.getElementById('cartCount');
+
+    cartBtn.onclick = () => cartSidebar.classList.toggle('open');
+    closeCart.onclick = () => cartSidebar.classList.remove('open');
+
+    document.querySelectorAll('.add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const img = btn.dataset.img;
+
+        const existing = cart.find(item => item.name === name);
+        if (existing) existing.quantity++;
+        else cart.push({ name, price, quantity: 1, img });
+
+        updateCart();
+      });
+    });
+
+    function updateCart() {
+      cartItemsEl.innerHTML = '';
+      let total = 0, count = 0;
+
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+      } else {
+        cart.forEach((item, i) => {
+          total += item.price * item.quantity;
+          count += item.quantity;
+
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <img src="${item.img}" alt="${item.name}">
+            <div>
+              <p class="cart-item-name">${item.name}</p>
+              <p class="cart-item-price">$${item.price.toFixed(2)}</p>
+              <div class="quantity-controls">
+                <button class="quantity-btn" onclick="changeQuantity(${i}, -1)">−</button>
+                <span>${item.quantity}</span>
+                <button class="quantity-btn" onclick="changeQuantity(${i}, 1)">+</button>
+              </div>
+            </div>
+          `;
+          cartItemsEl.appendChild(div);
+        });
+      }
+      cartTotalEl.textContent = '$' + total.toFixed(2);
+      cartCountEl.textContent = count;
+    }
+
+    window.changeQuantity = function(i, change) {
+      cart[i].quantity += change;
+      if (cart[i].quantity <= 0) cart.splice(i, 1);
+      updateCart();
+    };
+
+    // Filter & Search
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const items = document.querySelectorAll('.smoothie-item');
+    const searchInput = document.getElementById('searchInput');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterSmoothies();
+      });
+    });
+
+    searchInput.addEventListener('input', filterSmoothies);
+
+    function filterSmoothies() {
+      const filter = document.querySelector('.filter-btn.active').dataset.filter;
+      const term = searchInput.value.toLowerCase();
+
+      items.forEach(item => {
+        const category = item.dataset.category;
+        const title = item.dataset.title.toLowerCase();
+
+        const matchFilter = filter === 'all' || category === filter;
+        const matchSearch = title.includes(term);
+
+        item.style.display = (matchFilter && matchSearch) ? 'block' : 'none';
+      });
+    }
+  </script>
 </body>
 </html>
