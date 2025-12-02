@@ -13,7 +13,7 @@ A fun, responsive demo site for a smoothie shop. Browse 20+ smoothies, filter by
 2. Open `index.html` in your browser.
 
 ## Live Demo
-[View here](https://your-live-url.com)
+[View here →](https://pranitha1331.github.io/smoothie_bliss_website/)
 
 ## Customization
 Swap SVGs in `/images/` with your JPGs. Update prices in `index.html`.
